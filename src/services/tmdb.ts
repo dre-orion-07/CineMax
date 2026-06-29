@@ -1,17 +1,13 @@
 import axios from 'axios'
 import type { ApiError } from '@/types'
 
-const env = import.meta as ImportMeta & {
-  env: {
-    VITE_TMDB_BASE_URL?: string
-    VITE_TMDB_TOKEN?: string
-  }
-}
+const BASE_URL = 'https://api.themoviedb.org/3'
+const TOKEN = import.meta.env.VITE_TMDB_TOKEN as string
 
 const tmdbClient = axios.create({
-  baseURL: env.env.VITE_TMDB_BASE_URL || 'https://api.themoviedb.org/3',
+  baseURL: BASE_URL,
   headers: {
-    Authorization: `Bearer ${env.env.VITE_TMDB_TOKEN}`,
+    Authorization: `Bearer ${TOKEN}`,
     'Content-Type': 'application/json',
   },
 })
@@ -21,7 +17,8 @@ tmdbClient.interceptors.response.use(
   (error) => {
     const apiError: ApiError = {
       status_code: error.response?.status || 500,
-      status_message: error.response?.data?.status_message || 'Something went wrong',
+      status_message:
+        error.response?.data?.status_message || 'Something went wrong',
       success: false,
     }
     return Promise.reject(apiError)

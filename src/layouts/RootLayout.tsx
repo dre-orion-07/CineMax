@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
-import { Navbar } from '@/components/common/Navbar'
-import { Footer } from '@/components/common/Footer'
+import { Navbar } from '../components/common/Navbar'
+import { Footer } from '../components/common/Footer'
 
 export const RootLayout = () => {
   const { pathname } = useLocation()
