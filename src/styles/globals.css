@@ -30,6 +30,24 @@
   --transition-slow: 400ms ease;
 }
 
+[data-theme='light'] {
+  --color-bg-primary: #f7f7fa;
+  --color-bg-secondary: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #f0f0f5;
+
+  --color-text-primary: #14141f;
+  --color-text-secondary: #4a4a5a;
+  --color-text-muted: #8a8a9a;
+
+  --color-border: #e0e0e8;
+  --color-border-hover: #c8c8d8;
+
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+
 @layer base {
   * {
     margin: 0;

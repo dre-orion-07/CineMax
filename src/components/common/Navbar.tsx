@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Search, Heart, Bookmark, Menu, X, Film } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ThemeToggle } from './ThemeToggle'
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -92,6 +93,7 @@ export const Navbar = () => {
             >
               <Bookmark size={20} />
             </Link>
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
