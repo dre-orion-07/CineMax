@@ -20,7 +20,7 @@ const Home = () => {
       {/* Hero */}
       {trendingLoading ? (
         <div
-          className="w-full h-[70vh] min-h-[500px] animate-pulse"
+          className="w-full h-[85vh] min-h-[600px] animate-pulse"
           style={{ backgroundColor: 'var(--color-bg-card)' }}
         />
       ) : (
