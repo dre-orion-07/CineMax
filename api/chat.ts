@@ -1,12 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk'
-
 export const config = {
   runtime: 'edge',
 }
-
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
@@ -16,30 +10,44 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     const { messages } = await req.json()
 
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
-      system: `You are CineMax AI, a knowledgeable and enthusiastic movie assistant for the CineMax platform.
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1024,
+        messages: [
+          {
+            role: 'system',
+            content: `You are CineMax AI, a knowledgeable and enthusiastic movie assistant for the CineMax platform.
 You help users discover movies, get recommendations, understand plots, and explore cinema.
 Keep responses concise, engaging, and focused on movies.
 When recommending movies, always mention the title, year, and a brief reason why.
-If asked about spoilers, warn the user first.
-You have knowledge of movies up to your training cutoff.`,
-      messages,
+If asked about spoilers, warn the user first.`,
+          },
+          ...messages,
+        ],
+      }),
     })
 
-    const content = response.content[0]
-    if (content.type !== 'text') {
-      throw new Error('Unexpected response type')
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'Groq API error')
     }
 
-    return new Response(JSON.stringify({ message: content.text }), {
+    const content = data.choices[0].message.content
+
+    return new Response(JSON.stringify({ message: content }), {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error) {
-    console.error('Chat API error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
     return new Response(
-      JSON.stringify({ error: 'Failed to get response from AI' }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     )
   }
