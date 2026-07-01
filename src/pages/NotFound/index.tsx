@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Home, Film } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { SEOHead } from '@/components/common/SEOHead'
 
 const NotFound = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
+      <SEOHead title="404 - Page Not Found" description="The page you're looking for doesn't exist." />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -7,6 +7,7 @@ import { SkeletonCard } from '@/components/common/SkeletonCard'
 import { useDiscoverMovies, useInfiniteScroll } from '@/hooks'
 import { GENRES } from '@/constants'
 import type { SortOption } from '@/types'
+import { SEOHead } from '@/components/common/SEOHead'
 
 const Genres = () => {
   const [selectedGenreId, setSelectedGenreId] = useState<number>(GENRES[0].id)
@@ -39,6 +40,7 @@ const Genres = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-16 min-h-screen">
+      <SEOHead title="Browse by Genre" description="Discover movies across every genre on CineMax." />
       {/* Header */}
       <div className="mb-8">
         <h1

@@ -2,12 +2,14 @@ import { Bookmark } from 'lucide-react'
 import { MovieCard } from '@/components/common/MovieCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { useMovieStore } from '@/store'
+import { SEOHead } from '@/components/common/SEOHead'
 
 const Watchlist = () => {
   const { watchlist } = useMovieStore()
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-16 min-h-screen">
+      <SEOHead title="Watchlist" description="Your personal watchlist on CineMax." />
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <Bookmark

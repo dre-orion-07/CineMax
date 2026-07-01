@@ -10,6 +10,7 @@ import { useDebounce } from '@/hooks'
 import { useUIStore } from '@/store'
 import { searchService } from '@/services/searchService'
 import { QUERY_KEYS, STALE_TIMES } from '@/constants'
+import { SEOHead } from '@/components/common/SEOHead'
 
 const Search = () => {
   const [query, setQuery] = useState('')
@@ -40,7 +41,12 @@ const Search = () => {
   const hasResults = (data?.results?.length ?? 0) > 0
 
   return (
+    
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-16 min-h-screen">
+      <SEOHead
+  title={debouncedQuery ? `Search: ${debouncedQuery}` : 'Search'}
+  description="Search for your favourite movies on CineMax."
+/>
       {/* Search Input */}
       <div className="max-w-2xl mx-auto mb-8">
         <SearchBar

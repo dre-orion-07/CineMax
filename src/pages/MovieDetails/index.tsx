@@ -34,6 +34,7 @@ import { MovieCarousel } from '@/components/common/MovieCarousel'
 import { useQuery } from '@tanstack/react-query'
 import { movieService } from '@/services/movieService'
 import { QUERY_KEYS, STALE_TIMES } from '@/constants'
+import { SEOHead } from '@/components/common/SEOHead'
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>()
@@ -69,6 +70,12 @@ const MovieDetails = () => {
       </div>
     )
   }
+
+  <SEOHead
+  title={movie.title}
+  description={movie.overview}
+  image={movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : undefined}
+/>
 
   const trailer = videos?.results?.find(
     (v) => v.type === 'Trailer' && v.site === 'YouTube'

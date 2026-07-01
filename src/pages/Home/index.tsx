@@ -1,5 +1,6 @@
 import { HeroSection } from '@/components/common/HeroSection'
 import { MovieCarousel } from '@/components/common/MovieCarousel'
+import { SEOHead } from '@/components/common/SEOHead'
 import {
   useTrending,
   usePopular,
@@ -17,6 +18,8 @@ const Home = () => {
 
   return (
     <div>
+      <SEOHead />
+
       {/* Hero */}
       {trendingLoading ? (
         <div

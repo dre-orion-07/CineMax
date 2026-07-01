@@ -5,6 +5,7 @@ import { MovieCard } from '@/components/common/MovieCard'
 import { SkeletonCard } from '@/components/common/SkeletonCard'
 import { useInfiniteTrending, useInfiniteScroll } from '@/hooks'
 import type { TimeWindow } from '@/types'
+import { SEOHead } from '@/components/common/SEOHead'
 
 const Trending = () => {
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('week')
@@ -28,6 +29,7 @@ const Trending = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-16 min-h-screen">
+      <SEOHead title="Trending" description="See what movies are trending today and this week on CineMax." />
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <TrendingUp size={28} style={{ color: 'var(--color-accent-primary)' }} />

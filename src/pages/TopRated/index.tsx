@@ -2,6 +2,7 @@ import { Loader2, Award } from 'lucide-react'
 import { MovieCard } from '@/components/common/MovieCard'
 import { SkeletonCard } from '@/components/common/SkeletonCard'
 import { useInfiniteTopRated, useInfiniteScroll } from '@/hooks'
+import { SEOHead } from '@/components/common/SEOHead'
 
 const TopRated = () => {
   const {
@@ -23,6 +24,7 @@ const TopRated = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-16 min-h-screen">
+      <SEOHead title="Top Rated" description="The highest rated movies of all time on CineMax." />
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
         <Award size={28} style={{ color: 'var(--color-accent-secondary)' }} />
