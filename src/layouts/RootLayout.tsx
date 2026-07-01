@@ -5,6 +5,7 @@ import { Navbar } from '@/components/common/Navbar'
 import { Footer } from '@/components/common/Footer'
 import { BackToTop } from '@/components/common/BackToTop'
 import { ScrollProgressBar } from '@/components/common/ScrollProgressBar'
+import { AIAssistant } from '@/components/common/AIAssistant'
 
 export const RootLayout = () => {
   const { pathname } = useLocation()
@@ -22,6 +23,7 @@ export const RootLayout = () => {
       </main>
       <Footer />
       <BackToTop />
+      <AIAssistant />
       <Toaster
         position="bottom-right"
         toastOptions={{
