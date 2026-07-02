@@ -3,6 +3,50 @@ import { createServer } from 'http'
 
 config()
 
+const TMDB_BASE = 'https://api.themoviedb.org/3'
+const TMDB_TOKEN = process.env.VITE_TMDB_TOKEN
+const GROQ_KEY = process.env.GROQ_API_KEY
+
+async function fetchTMDBContext(query) {
+  try {
+    const headers = { Authorization: `Bearer ${TMDB_TOKEN}` }
+
+    const [multiRes, trendingRes] = await Promise.all([
+      fetch(`${TMDB_BASE}/search/multi?query=${encodeURIComponent(query)}&include_adult=false&page=1`, { headers }),
+      fetch(`${TMDB_BASE}/trending/all/week`, { headers }),
+    ])
+
+    const [multiData, trendingData] = await Promise.all([
+      multiRes.json(),
+      trendingRes.json(),
+    ])
+
+    const searchResults = (multiData.results || [])
+      .filter((r) => r.media_type === 'movie' || r.media_type === 'tv')
+      .slice(0, 5)
+      .map((r) => ({
+        type: r.media_type,
+        title: r.title || r.name,
+        year: (r.release_date || r.first_air_date || '').slice(0, 4),
+        rating: r.vote_average?.toFixed(1),
+        overview: r.overview?.slice(0, 150),
+      }))
+
+    const trending = (trendingData.results || [])
+      .slice(0, 5)
+      .map((r) => ({
+        type: r.media_type,
+        title: r.title || r.name,
+        year: (r.release_date || r.first_air_date || '').slice(0, 4),
+        rating: r.vote_average?.toFixed(1),
+      }))
+
+    return { searchResults, trending }
+  } catch {
+    return { searchResults: [], trending: [] }
+  }
+}
+
 const server = createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -20,12 +64,26 @@ const server = createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const { messages } = JSON.parse(body)
+        const lastUserMessage = messages[messages.length - 1]?.content || ''
+
+        const { searchResults, trending } = await fetchTMDBContext(lastUserMessage)
+
+        const tmdbContext = `
+CURRENT TMDB DATA FOR THIS QUERY:
+Search results for "${lastUserMessage}":
+${searchResults.length > 0
+  ? searchResults.map((r) => `- [${r.type.toUpperCase()}] ${r.title} (${r.year}) - Rating: ${r.rating}/10 - ${r.overview}`).join('\n')
+  : 'No direct matches found.'}
+
+CURRENTLY TRENDING ON TMDB:
+${trending.map((r) => `- [${r.type.toUpperCase()}] ${r.title} (${r.year}) - Rating: ${r.rating}/10`).join('\n')}
+`
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+            Authorization: `Bearer ${GROQ_KEY}`,
           },
           body: JSON.stringify({
             model: 'llama-3.3-70b-versatile',
@@ -33,11 +91,14 @@ const server = createServer(async (req, res) => {
             messages: [
               {
                 role: 'system',
-                content: `You are CineMax AI, a knowledgeable and enthusiastic movie assistant for the CineMax platform.
-You help users discover movies, get recommendations, understand plots, and explore cinema.
-Keep responses concise, engaging, and focused on movies.
-When recommending movies, always mention the title, year, and a brief reason why.
-If asked about spoilers, warn the user first.`,
+                content: `You are CineMax AI, a knowledgeable movie and TV assistant with access to live TMDB data.
+You help users discover movies, TV shows, anime, and Nollywood content.
+Always use the TMDB data provided to give accurate, current recommendations.
+When recommending content, mention the title, year, rating, and a brief reason why.
+If asked about spoilers, warn the user first.
+Keep responses concise and engaging.
+
+${tmdbContext}`,
               },
               ...messages,
             ],
@@ -46,9 +107,7 @@ If asked about spoilers, warn the user first.`,
 
         const data = await response.json()
 
-        if (!response.ok) {
-          throw new Error(data.error?.message || 'Groq API error')
-        }
+        if (!response.ok) throw new Error(data.error?.message || 'Groq API error')
 
         const content = data.choices[0].message.content
         res.writeHead(200, { 'Content-Type': 'application/json' })

@@ -14,6 +14,55 @@ const SUGGESTED_PROMPTS = [
   'Top rated psychological thrillers',
 ]
 
+const formatMessage = (content: string) => {
+  const lines = content.split('\n').filter((line) => line.trim() !== '')
+  return (
+    <div className="flex flex-col gap-2">
+      {lines.map((line, i) => {
+        const trimmed = line.trim()
+
+        if (trimmed.match(/^\d+\.\s/)) {
+          return (
+            <div key={i} className="flex gap-2">
+              <span
+                className="font-bold flex-shrink-0"
+                style={{ color: 'var(--color-accent-secondary)' }}
+              >
+                {trimmed.match(/^\d+/)?.[0]}.
+              </span>
+              <span>{trimmed.replace(/^\d+\.\s/, '')}</span>
+            </div>
+          )
+        }
+
+        if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+          return (
+            <div key={i} className="flex gap-2">
+              <span
+                className="flex-shrink-0"
+                style={{ color: 'var(--color-accent-primary)' }}
+              >
+                •
+              </span>
+              <span>{trimmed.replace(/^[-•]\s/, '')}</span>
+            </div>
+          )
+        }
+
+        if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+          return (
+            <p key={i} className="font-bold" style={{ color: 'var(--color-text-primary)' }}>
+              {trimmed.replace(/\*\*/g, '')}
+            </p>
+          )
+        }
+
+        return <p key={i}>{trimmed}</p>
+      })}
+    </div>
+  )
+}
+
 export const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
@@ -96,7 +145,7 @@ export const AIAssistant = () => {
             style={{
               backgroundColor: 'var(--color-bg-secondary)',
               border: '1px solid var(--color-border)',
-              maxHeight: '500px',
+              maxHeight: '520px',
             }}
           >
             {/* Header */}
@@ -111,7 +160,7 @@ export const AIAssistant = () => {
                 <Bot size={20} />
                 <div>
                   <p className="font-semibold text-sm">CineMax AI</p>
-                  <p className="text-xs opacity-80">Your movie assistant</p>
+                  <p className="text-xs opacity-80">Your movie & TV assistant</p>
                 </div>
               </div>
               <button
@@ -124,7 +173,10 @@ export const AIAssistant = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ minHeight: '300px' }}>
+            <div
+              className="flex-1 overflow-y-auto p-4 flex flex-col gap-3"
+              style={{ minHeight: '300px' }}
+            >
               {messages.length === 0 && (
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start gap-2">
@@ -141,7 +193,7 @@ export const AIAssistant = () => {
                         color: 'var(--color-text-primary)',
                       }}
                     >
-                      Hi! I'm CineMax AI. Ask me anything about movies — recommendations, reviews, or plot explanations!
+                      Hi! I'm CineMax AI. Ask me anything about movies, TV shows, anime, or Nollywood — powered by live TMDB data!
                     </div>
                   </div>
 
@@ -179,7 +231,7 @@ export const AIAssistant = () => {
                     </div>
                   )}
                   <div
-                    className="px-3 py-2 rounded-2xl text-sm max-w-[80%]"
+                    className="px-3 py-2 text-sm max-w-[80%]"
                     style={{
                       backgroundColor:
                         msg.role === 'user'
@@ -195,7 +247,9 @@ export const AIAssistant = () => {
                           : '16px 16px 16px 4px',
                     }}
                   >
-                    {msg.content}
+                    {msg.role === 'assistant'
+                      ? formatMessage(msg.content)
+                      : msg.content}
                   </div>
                 </div>
               ))}
@@ -212,8 +266,14 @@ export const AIAssistant = () => {
                     className="px-3 py-2 rounded-2xl flex items-center gap-1"
                     style={{ backgroundColor: 'var(--color-bg-card)' }}
                   >
-                    <Loader2 size={14} className="animate-spin" style={{ color: 'var(--color-text-muted)' }} />
-                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Thinking...</span>
+                    <Loader2
+                      size={14}
+                      className="animate-spin"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    />
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                      Thinking...
+                    </span>
                   </div>
                 </div>
               )}
@@ -231,7 +291,7 @@ export const AIAssistant = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask about movies..."
+                placeholder="Ask about movies, TV shows, anime..."
                 className="flex-1 bg-transparent outline-none text-sm"
                 style={{ color: 'var(--color-text-primary)' }}
                 aria-label="Message input"
@@ -242,10 +302,12 @@ export const AIAssistant = () => {
                 whileTap={{ scale: 0.9 }}
                 className="p-2 rounded-full cursor-pointer transition-colors duration-200"
                 style={{
-                  backgroundColor: input.trim() && !isLoading
-                    ? 'var(--color-accent-primary)'
-                    : 'var(--color-bg-card)',
-                  color: input.trim() && !isLoading ? 'white' : 'var(--color-text-muted)',
+                  backgroundColor:
+                    input.trim() && !isLoading
+                      ? 'var(--color-accent-primary)'
+                      : 'var(--color-bg-card)',
+                  color:
+                    input.trim() && !isLoading ? 'white' : 'var(--color-text-muted)',
                 }}
                 aria-label="Send message"
               >
