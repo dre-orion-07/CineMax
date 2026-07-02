@@ -5,7 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from './ThemeToggle'
 
 const navLinks = [
-  { label: 'Home', path: '/' },
+  { label: 'Movies', path: '/' },
+  { label: 'TV Shows', path: '/tv' },
+  { label: 'Anime', path: '/anime' },
+  { label: 'Nollywood', path: '/nollywood' },
   { label: 'Trending', path: '/trending' },
   { label: 'Top Rated', path: '/top-rated' },
   { label: 'Genres', path: '/genres' },
